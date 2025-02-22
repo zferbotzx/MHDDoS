@@ -10,7 +10,7 @@ from threading import Lock, Thread, Timer
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 # Configuración del bot
-BOT_TOKEN = "7692852873:AAHQ3YtPu90LarVnzyPRd4695zPDKY8taOQ"
+BOT_TOKEN = "7692852873:AAENsX-cI0gwtuZLzWUzpr7BBXqzUYW9B-E"
 ADMIN_ID = 6348583777
 GROUP_LINK = "@zFerCrashGoup"  # Reemplaza con el enlace de tu grupo
 START_PY_PATH = "/workspaces/MHDDoS/start.py"
