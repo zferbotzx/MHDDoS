@@ -633,6 +633,49 @@ def handle_broadcastgroup(message):
 
     bot.reply_to(message, f"✅ Mensaje enviado a {success_count} grupos. ❌ Falló en {fail_count}.")
 
+def notify_groups_bot_started():
+    """Notifica a los grupos que el bot ha sido encendido."""
+    groups = load_groups()
+    for group_id in groups:
+        try:
+            bot.send_message(
+                group_id,
+                "✅ *¡El bot ha sido reactivado!*\n\n"
+                "Ya puedes seguir utilizando los comandos disponibles.\n\n"
+                "¡Gracias por su paciencia! 💪",
+                parse_mode="Markdown",
+            )
+        except Exception as e:
+            print(f"No se pudo enviar mensaje al grupo {group_id}: {str(e)}")
+
+def check_shutdown_time():
+    """Verifica el tiempo restante y notifica a los grupos cuando falten 5 minutos."""
+    start_time = time.time()  # Tiempo de inicio del bot
+    while True:
+        elapsed_time = time.time() - start_time
+        remaining_time = max(0, 140 * 60 - elapsed_time)  # 140 minutos en segundos
+
+        if remaining_time <= 300:  # 5 minutos en segundos
+            groups = load_groups()
+            for group_id in groups:
+                try:
+                    bot.send_message(
+                        group_id,
+                        "⚠️ *Aviso Importante:*\n\n"
+                        "El bot se apagará en **5 minutos** debido a límites de tiempo.\n"
+                        "Un administrador lo reactivará pronto. Por favor, sean pacientes.\n\n"
+                        "¡Gracias por su comprensión! 🙏",
+                        parse_mode="Markdown",
+                    )
+                except Exception as e:
+                    print(f"No se pudo enviar mensaje al grupo {group_id}: {str(e)}")
+
+            # Esperar a que el bot se apague
+            time.sleep(300)  # Esperar 5 minutos
+            break
+
+        time.sleep(60)  # Verificar cada minuto
+
 if __name__ == "__main__":
     # Notificar a los grupos que el bot ha sido encendido
     notify_groups_bot_started()
