@@ -4,7 +4,7 @@
 <em><h5 align="center">(Programming Language - Python 3)</h5></em>
 
 <p align="center">
-<a href="#"><img alt="https://youtube.com/@krizzzmodzofc3" src="[https://img.shields.io/github/forks/KzTeam/MHDDoS?style=for-the-badge](https://www.tiktok.com/@xfernandoh)"></a>
+<a href="#"><img alt="https://www.tiktok.com/@xfernandoh" src="[https://img.shields.io/github/forks/KzTeam/MHDDoS?style=for-the-badge](https://www.tiktok.com/@xfernandoh)"></a>
 <a href="#"><img alt="MH-DDoS last commit (main)" src="https://img.shields.io/github/last-commit/MatrixTM/MHDDoS/main?color=green&style=for-the-badge"></a>
 <a href="#"><img alt="MH-DDoS Repo stars" src="https://img.shields.io/github/stars/MatrixTM/MHDDoS?style=for-the-badge&color=yellow"></a>
 <a href="#"><img alt="MH-DDoS License" src="https://img.shields.io/github/license/MatrixTM/MHDDoS?color=orange&style=for-the-badge"></a>
