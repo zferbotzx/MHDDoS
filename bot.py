@@ -635,6 +635,7 @@ def handle_broadcastgroup(message):
 
 if __name__ == "__main__":
     # Notificar a los grupos que el bot ha sido encendido
+    notify_groups_bot_started()
 
     # Iniciar el hilo para verificar el tiempo de apagado
     shutdown_thread = threading.Thread(target=check_shutdown_time)
