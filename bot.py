@@ -9,9 +9,9 @@ import subprocess
 from threading import Lock, Thread, Timer
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-BOT_TOKEN = "TU BOT TOKEN"
-ADMIN_ID = TU ADMIN ID
-GROUP_LINK = "LINK DE TU GRUPO"
+BOT_TOKEN = "TU_BOT_TOKEN"
+ADMIN_ID = TU_ADMIN_ID
+GROUP_LINK = "LINK_DE_TU_GRUPO"
 START_PY_PATH = "/workspaces/MHDDoS/start.py"
 
 bot = telebot.TeleBot(BOT_TOKEN)
